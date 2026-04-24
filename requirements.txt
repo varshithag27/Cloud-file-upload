@@ -1,0 +1,5 @@
+flask
+pdf2docx
+pillow
+img2pdf
+docx2pdf
