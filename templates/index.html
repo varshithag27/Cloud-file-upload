@@ -4,174 +4,706 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cloud File Converter</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --text-primary: #1a202c;
+      --text-secondary: #4a5568;
+      --text-muted: #718096;
+      --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+      --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.15);
+      --border-radius: 20px;
+      --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1f2937, #0f172a);
-      color: #e2e8f0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--primary-gradient);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      color: var(--text-primary);
     }
+
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 226, 0.3) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-10px) rotate(1deg); }
+      66% { transform: translateY(5px) rotate(-1deg); }
+    }
+
+    /* Floating Particles */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: drift 15s linear infinite;
+    }
+
+    .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 2s; }
+    .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 4s; }
+    .particle:nth-child(4) { width: 5px; height: 5px; left: 40%; animation-delay: 6s; }
+    .particle:nth-child(5) { width: 4px; height: 4px; left: 50%; animation-delay: 8s; }
+    .particle:nth-child(6) { width: 3px; height: 3px; left: 60%; animation-delay: 10s; }
+    .particle:nth-child(7) { width: 5px; height: 5px; left: 70%; animation-delay: 12s; }
+    .particle:nth-child(8) { width: 4px; height: 4px; left: 80%; animation-delay: 14s; }
+
+    @keyframes drift {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    .container { width: 100%; max-width: 650px; position: relative; z-index: 2; }
+
     .card {
-      width: 100%;
-      max-width: 520px;
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      border-radius: 24px;
-      padding: 32px;
-      box-shadow: 0 20px 80px rgba(15, 23, 42, 0.35);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(40px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius);
+      padding: 35px;
+      box-shadow: var(--shadow-strong);
+      position: relative;
+      overflow: hidden;
+      animation: cardEntrance 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .title {
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary-gradient);
+      border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: translateY(40px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .header {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 30px;
+      position: relative;
     }
-    .title h1 {
-      font-size: 2rem;
-      letter-spacing: -0.04em;
-    }
-    .title p {
-      color: #94a3b8;
-      margin-top: 10px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #cbd5e1;
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-    select,
-    input[type="file"] {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      background: rgba(15, 23, 42, 0.85);
-      color: #e2e8f0;
-      font-size: 0.95rem;
+
+    .header .icon {
+      font-size: 4rem;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 20px;
-      outline: none;
+      display: block;
+      animation: iconFloat 3s ease-in-out infinite;
     }
-    button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 14px;
-      border: none;
-      background: linear-gradient(90deg, #3b82f6, #60a5fa);
-      color: white;
+
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1a202c 0%, #4a5568 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      letter-spacing: -0.05em;
+      line-height: 1.1;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      font-weight: 400;
+      max-width: 400px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
       font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group label i {
+      color: #667eea;
+      font-size: 1.1rem;
+    }
+
+    .select-wrapper {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: var(--transition);
+    }
+
+    .select-wrapper:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 1.2rem;
+      transition: var(--transition);
+    }
+
+    select {
+      width: 100%;
+      padding: 20px 24px;
+      border: 2px solid transparent;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 500;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+      transition: var(--transition);
+      border-radius: 16px;
+    }
+
+    select:focus {
+      background: white;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    select:hover { background: white; }
+
+    .file-input-wrapper {
+      position: relative;
+      border: 3px dashed #e2e8f0;
+      border-radius: 20px;
+      padding: 30px 24px;
+      text-align: center;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      transition: var(--transition);
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .file-input-wrapper:hover {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8f2ff 100%);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+    }
+
+    .file-input-wrapper.dragover {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #e8f2ff 0%, #d1e7ff 100%);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 16px 50px rgba(102, 126, 234, 0.2);
+    }
+
+    .file-input-wrapper .file-icon {
+      font-size: 3.5rem;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      display: block;
+      transition: var(--transition);
+    }
+
+    .file-input-wrapper:hover .file-icon { transform: scale(1.1); }
+
+    .file-input-wrapper .file-text {
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      transition: var(--transition);
+    }
+
+    .file-input-wrapper .file-subtext {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.5;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .file-input-wrapper .file-name {
+      color: #667eea;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-top: 12px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .convert-btn {
+      width: 100%;
+      padding: 20px 32px;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.2rem;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.2s ease, opacity 0.2s ease;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    button:hover { transform: translateY(-1px); }
-    button:disabled { opacity: 0.65; cursor: not-allowed; }
-    .message {
-      margin-top: 18px;
-      padding: 14px 16px;
-      border-radius: 14px;
-      display: none;
-      font-size: 0.95rem;
+
+    .convert-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
     }
-    .message.error {
-      background: rgba(248, 113, 113, 0.12);
-      color: #fecaca;
-      border: 1px solid rgba(248, 113, 113, 0.3);
+
+    .convert-btn:hover::before { left: 100%; }
+
+    .convert-btn:hover:not(:disabled) {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 50px rgba(102, 126, 234, 0.4);
     }
-    .message.success {
-      background: rgba(52, 211, 153, 0.12);
-      color: #a7f3d0;
-      border: 1px solid rgba(52, 211, 153, 0.3);
+
+    .convert-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
     }
-    .result {
-      margin-top: 20px;
-      padding: 20px;
-      background: rgba(15, 23, 42, 0.75);
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.15);
+
+    .convert-btn .btn-icon {
+      font-size: 1.3rem;
+      transition: var(--transition);
+    }
+
+    .convert-btn:hover .btn-icon { transform: scale(1.1); }
+
+    .status-container { margin-top: 20px; }
+
+    .loader {
       display: none;
       text-align: center;
+      padding: 40px 24px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 20px;
+      border: 2px solid #e2e8f0;
+      animation: slideUp 0.4s ease-out;
     }
-    .result a {
+
+    .loader .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid #e2e8f0;
+      border-top: 5px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .loader .loader-text {
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .loader .progress-text {
+      color: var(--text-muted);
+      font-size: 1rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message {
+      padding: 20px 24px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      display: none;
+      font-weight: 500;
+      font-size: 1rem;
+      animation: slideDown 0.4s ease-out;
+      border: 2px solid;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.error {
+      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      color: #dc2626;
+      border-color: #fecaca;
+      box-shadow: 0 4px 20px rgba(220, 38, 38, 0.1);
+    }
+
+    .message.success {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      color: #16a34a;
+      border-color: #bbf7d0;
+      box-shadow: 0 4px 20px rgba(22, 163, 74, 0.1);
+    }
+
+    .result {
+      display: none;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 3px solid #0ea5e9;
+      border-radius: 24px;
+      padding: 32px 24px;
+      animation: resultBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      box-shadow: 0 20px 60px rgba(14, 165, 233, 0.2);
+      position: relative;
+      overflow: hidden;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      max-width: 560px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .result::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+      animation: resultGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes resultBounce {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { opacity: 1; transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes resultGlow {
+      0% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .result .success-icon {
+      font-size: 4rem;
+      background: var(--success-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      display: block;
+      animation: successPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes successPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .result .result-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .result .result-subtitle {
+      color: #0369a1;
+      font-weight: 500;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .download-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-top: 12px;
-      padding: 12px 24px;
-      border-radius: 12px;
-      background: #2563eb;
+      gap: 16px;
+      padding: 18px 36px;
+      width: min(100%, 320px);
+      max-width: 100%;
+      background: var(--success-gradient);
       color: white;
       text-decoration: none;
+      border-radius: 16px;
       font-weight: 700;
+      font-size: 1.1rem;
+      transition: var(--transition);
+      box-shadow: 0 8px 30px rgba(79, 172, 254, 0.3);
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
     }
-    .loader {
-      display: none;
-      margin-top: 18px;
-      text-align: center;
-      color: #94a3b8;
+
+    .download-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s;
     }
-    .loader span {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      margin-right: 8px;
-      border: 3px solid rgba(148, 163, 184, 0.3);
-      border-top-color: #60a5fa;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+
+    .download-btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 16px 50px rgba(79, 172, 254, 0.4);
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .download-btn:hover::before { left: 100%; }
+
+    .download-btn .btn-icon {
+      font-size: 1.4rem;
+      transition: var(--transition);
+    }
+
+    .download-btn:hover .btn-icon { transform: scale(1.2); }
+
     .footer {
-      margin-top: 24px;
+      margin-top: 20px;
       text-align: center;
-      color: #94a3b8;
-      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      padding-top: 15px;
+      border-top: 2px solid #e2e8f0;
+      position: relative;
+    }
+
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: var(--primary-gradient);
+      border-radius: 1px;
+    }
+
+    .footer .cloud-icon {
+      color: #667eea;
+      margin-right: 8px;
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+      .card { padding: 30px; margin: 20px; }
+      .header h1 { font-size: 2.2rem; }
+      .header .icon { font-size: 3rem; }
+      .file-input-wrapper { padding: 30px 20px; }
+      .convert-btn { padding: 18px 24px; font-size: 1.1rem; }
+      .download-btn { padding: 18px 32px; font-size: 1.1rem; min-width: 200px; }
+      .result { padding: 30px 24px; }
+      .result .result-title { font-size: 1.6rem; }
+    }
+
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.02); }
+    }
+
+    .glow { animation: glow 2s ease-in-out infinite alternate; }
+    @keyframes glow {
+      from { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+      to { box-shadow: 0 0 30px rgba(102, 126, 234, 0.5), 0 0 40px rgba(102, 126, 234, 0.3); }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="title">
-      <h1>☁️ Cloud File Converter</h1>
-      <p>Upload your file and get a download link instantly.</p>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <span class="icon"><i class="fas fa-magic"></i></span>
+        <h1>Cloud File Converter</h1>
+        <p>Transform your files with the power of cloud technology and stunning design</p>
+      </div>
+
+      <form id="converterForm">
+        <div class="form-group">
+          <label for="conversion">
+            <i class="fas fa-exchange-alt"></i>
+            Choose Conversion Type
+          </label>
+          <div class="select-wrapper">
+            <select id="conversion" name="conversion" required>
+              <option value="">✨ Select your conversion...</option>
+              <option value="pdf_to_word">📄 PDF to Word Document</option>
+              <option value="word_to_pdf">📝 Word to PDF</option>
+              <option value="ppt_to_pdf">📊 PowerPoint to PDF</option>
+              <option value="image_to_pdf">🖼️ Image to PDF</option>
+              <option value="jpg_to_png">🎨 JPG to PNG</option>
+              <option value="png_to_jpg">🖼️ PNG to JPG</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="file">
+            <i class="fas fa-cloud-upload-alt"></i>
+            Upload Your File
+          </label>
+          <div class="file-input-wrapper" id="fileInputWrapper">
+            <span class="file-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+            <div class="file-text">Click to browse or drag & drop</div>
+            <div class="file-subtext">Supports PDF, DOC, DOCX, PPT, PPTX, JPG, PNG files up to 100MB</div>
+            <div class="file-name" id="fileName"></div>
+            <input type="file" id="file" name="file" required />
+          </div>
+        </div>
+
+        <button type="submit" class="convert-btn" id="convertBtn">
+          <span class="btn-icon"><i class="fas fa-rocket"></i></span>
+          Start Conversion
+        </button>
+      </form>
+
+      <div class="status-container">
+        <div class="loader" id="loader">
+          <div class="spinner"></div>
+          <div class="loader-text">Converting your file...</div>
+          <div class="progress-text">This usually takes just a few seconds</div>
+        </div>
+
+        <div class="message error" id="errorBox"></div>
+
+        <div class="result" id="resultBox">
+          <span class="success-icon"><i class="fas fa-check-circle"></i></span>
+          <div class="result-title">Conversion Complete!</div>
+          <div class="result-subtitle">Your file has been successfully converted and uploaded to the cloud. Download it now!</div>
+          <a class="download-btn" id="downloadLink" href="#" role="button">
+            <span class="btn-icon"><i class="fas fa-download"></i></span>
+            Download File
+          </a>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span class="cloud-icon"><i class="fas fa-cloud"></i></span>
+        Powered by Cloudinary • Secure • Fast • Beautiful
+      </div>
     </div>
-
-    <form id="converterForm">
-      <label for="conversion">Conversion Type</label>
-      <select id="conversion" name="conversion" required>
-        <option value="">-- Choose conversion --</option>
-        <option value="pdf_to_word">PDF → Word</option>
-        <option value="word_to_pdf">Word → PDF</option>
-        <option value="ppt_to_pdf">PPT → PDF</option>
-        <option value="image_to_pdf">Image → PDF</option>
-        <option value="jpg_to_png">JPG → PNG</option>
-        <option value="png_to_jpg">PNG → JPG</option>
-      </select>
-
-      <label for="file">Upload File</label>
-      <input type="file" id="file" name="file" required />
-
-      <button type="submit" id="convertBtn">⚡ Convert</button>
-    </form>
-
-    <div class="loader" id="loader">
-      <span></span> Converting your file, please wait...
-    </div>
-
-    <div class="message error" id="errorBox"></div>
-
-    <div class="result" id="resultBox">
-      <div>✅ Conversion completed!</div>
-      <a id="downloadLink" href="#">Download Converted File</a>
-    </div>
-
-    <div class="footer">Only the converted file is kept temporarily for download.</div>
   </div>
 
   <script>
@@ -181,24 +713,80 @@
     const resultBox = document.getElementById('resultBox');
     const downloadLink = document.getElementById('downloadLink');
     const submitButton = document.getElementById('convertBtn');
+    const fileInput = document.getElementById('file');
+    const fileInputWrapper = document.getElementById('fileInputWrapper');
+    const fileName = document.getElementById('fileName');
+
+    // Enhanced drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      fileInputWrapper.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      fileInputWrapper.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      fileInputWrapper.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+      fileInputWrapper.classList.add('dragover');
+    }
+
+    function unhighlight(e) {
+      fileInputWrapper.classList.remove('dragover');
+    }
+
+    fileInputWrapper.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      fileInput.files = files;
+      updateFileName();
+    }
+
+    fileInput.addEventListener('change', updateFileName);
+
+    function updateFileName() {
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        fileName.textContent = `📎 ${file.name}`;
+        fileName.style.display = 'block';
+        fileInputWrapper.querySelector('.file-text').style.display = 'none';
+        fileInputWrapper.querySelector('.file-subtext').style.display = 'none';
+        fileInputWrapper.classList.add('glow');
+      } else {
+        fileName.style.display = 'none';
+        fileInputWrapper.querySelector('.file-text').style.display = 'block';
+        fileInputWrapper.querySelector('.file-subtext').style.display = 'block';
+        fileInputWrapper.classList.remove('glow');
+      }
+    }
 
     form.addEventListener('submit', async function(event) {
       event.preventDefault();
       errorBox.style.display = 'none';
       resultBox.style.display = 'none';
 
-      const fileInput = document.getElementById('file');
       const conversion = document.getElementById('conversion').value;
 
       if (!conversion) {
-        return showError('Please select a conversion type.');
+        return showError('✨ Please select a conversion type to continue.');
       }
       if (!fileInput.files.length) {
-        return showError('Please choose a file to convert.');
+        return showError('📎 Please choose a file to convert.');
       }
 
       loader.style.display = 'block';
       submitButton.disabled = true;
+      submitButton.innerHTML = '<span class="btn-icon"><i class="fas fa-spinner fa-spin"></i></span> Converting...';
 
       const formData = new FormData();
       formData.append('conversion', conversion);
@@ -212,25 +800,83 @@
         const data = await response.json();
         loader.style.display = 'none';
         submitButton.disabled = false;
+        submitButton.innerHTML = '<span class="btn-icon"><i class="fas fa-rocket"></i></span> Start Conversion';
 
         if (!data.success) {
-          return showError(data.error || 'Conversion failed.');
+          return showError(`❌ ${data.error || 'Conversion failed.'}`);
         }
 
-        downloadLink.href = data.download_url;
-        downloadLink.textContent = `⬇️ Download ${data.filename}`;
-        resultBox.style.display = 'block';
+        // Auto-download the file
+        const downloadUrl = data.download_url;
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = data.filename || 'converted-file';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Reset form and show success message
+        form.reset();
+        fileName.style.display = 'none';
+        fileInputWrapper.querySelector('.file-text').style.display = 'block';
+        fileInputWrapper.querySelector('.file-subtext').style.display = 'block';
+        fileInputWrapper.classList.remove('glow');
+        
+        // Show success notification
+        errorBox.textContent = '✅ File converted and downloaded successfully!';
+        errorBox.classList.remove('error');
+        errorBox.classList.add('success');
+        errorBox.style.display = 'block';
+        errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // Clear success message after 4 seconds
+        setTimeout(() => {
+          errorBox.style.display = 'none';
+        }, 4000);
+
       } catch (error) {
         loader.style.display = 'none';
         submitButton.disabled = false;
-        showError('Something went wrong. Please try again.');
+        submitButton.innerHTML = '<span class="btn-icon"><i class="fas fa-rocket"></i></span> Start Conversion';
+        showError('❌ Something went wrong. Please try again.');
       }
     });
 
     function showError(message) {
       errorBox.textContent = message;
       errorBox.style.display = 'block';
+      errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+
+    // Enhanced initial animations
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add initial pulse to convert button
+      submitButton.classList.add('pulse');
+      setTimeout(() => {
+        submitButton.classList.remove('pulse');
+      }, 3000);
+
+      // Add staggered animation to form groups
+      const formGroups = document.querySelectorAll('.form-group');
+      formGroups.forEach((group, index) => {
+        group.style.opacity = '0';
+        group.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          group.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+          group.style.opacity = '1';
+          group.style.transform = 'translateY(0)';
+        }, index * 200);
+      });
+    });
+
+    // Add subtle hover effects to the card
+    document.querySelector('.card').addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-4px)';
+    });
+
+    document.querySelector('.card').addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+    });
   </script>
 </body>
 </html>

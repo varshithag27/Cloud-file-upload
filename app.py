@@ -1,12 +1,45 @@
 ﻿from flask import Flask, request, send_file, render_template, after_this_request, abort
 import os
 import uuid
+import io
+import requests
 from PIL import Image
 import img2pdf
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+from dotenv import load_dotenv
+import sys
+
+# Load environment variables from .env file
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 app = Flask(__name__, template_folder='templates')
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Cloudinary Configuration with error checking
+cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
+api_key = os.getenv('CLOUDINARY_API_KEY')
+api_secret = os.getenv('CLOUDINARY_API_SECRET')
+
+# Debug: Print if credentials are loaded
+if not cloud_name or not api_key or not api_secret:
+    print("⚠️ WARNING: Cloudinary credentials not found in environment!")
+    print(f"  CLOUDINARY_CLOUD_NAME: {cloud_name}")
+    print(f"  CLOUDINARY_API_KEY: {api_key}")
+    print(f"  CLOUDINARY_API_SECRET: {api_secret}")
+    print("Make sure .env file exists in project root with your credentials!")
+else:
+    print(f"✅ Cloudinary configured successfully!")
+    print(f"   Cloud Name: {cloud_name}")
+
+cloudinary.config(
+    cloud_name=cloud_name,
+    api_key=api_key,
+    api_secret=api_secret
+)
 
 
 def make_unique_path(filename, suffix):
@@ -100,11 +133,24 @@ def convert():
         else:
             return {"success": False, "error": "Conversion type not supported."}, 400
 
-        return {
-            "success": True,
-            "download_url": f"/download/{os.path.basename(output_path)}",
-            "filename": os.path.basename(output_path),
-        }
+        # Upload converted file to Cloudinary
+        try:
+            upload_result = cloudinary.uploader.upload(
+                output_path,
+                resource_type="auto",
+                public_id=os.path.splitext(os.path.basename(output_path))[0],
+                overwrite=True
+            )
+            cloudinary_url = upload_result['secure_url']
+            
+            return {
+                "success": True,
+                "download_url": cloudinary_url,
+                "filename": os.path.basename(output_path),
+                "cloudinary_public_id": upload_result['public_id']
+            }
+        except Exception as upload_exc:
+            return {"success": False, "error": f"Cloudinary upload failed: {str(upload_exc)}"}, 500
 
     except Exception as exc:
         return {"success": False, "error": str(exc)}, 500
@@ -112,25 +158,37 @@ def convert():
     finally:
         if os.path.exists(input_path):
             os.remove(input_path)
+        if output_path and os.path.exists(output_path):
+            os.remove(output_path)
 
 
-@app.route("/download/<filename>")
-def download(filename):
-    safe_name = os.path.basename(filename)
-    output_path = os.path.join(UPLOAD_FOLDER, safe_name)
-    if not os.path.exists(output_path):
+@app.route("/download/<path:public_id>")
+def download(public_id):
+    """
+    Download file from Cloudinary by redirecting to the secure URL
+    """
+    try:
+        # Get resource from Cloudinary
+        resource = cloudinary.api.resource(public_id)
+        download_url = resource.get('secure_url')
+        
+        if not download_url:
+            abort(404)
+        
+        # Get the file and send it
+        import requests
+        response = requests.get(download_url)
+        
+        if response.status_code == 200:
+            return send_file(
+                io.BytesIO(response.content),
+                as_attachment=True,
+                download_name=os.path.basename(download_url)
+            )
+        else:
+            abort(404)
+    except Exception:
         abort(404)
-
-    @after_this_request
-    def remove_file(response):
-        try:
-            if os.path.exists(output_path):
-                os.remove(output_path)
-        except Exception:
-            pass
-        return response
-
-    return send_file(output_path, as_attachment=True)
 
 
 if __name__ == "__main__":

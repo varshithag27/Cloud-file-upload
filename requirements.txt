@@ -1,5 +1,8 @@
 flask
+cloudinary
 pdf2docx
 pillow
 img2pdf
 docx2pdf
+python-dotenv
+requests
